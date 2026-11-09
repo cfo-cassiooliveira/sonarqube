@@ -1,0 +1,7 @@
+# Segredos locais (Art. IV.4)
+.env
+# Tokens de análise gerados pelo provisionamento (um arquivo por projeto)
+.tokens/
+# IDE
+.vs/
+.idea/

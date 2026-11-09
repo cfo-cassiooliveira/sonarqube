@@ -1,0 +1,82 @@
+# SonarQube Community Build (qualidade de código) para os projetos do C:\Workspace: postgres + sonarqube + provisioner.
+# Uso: ./scripts/generate-env.sh && docker compose up -d --build     (UI: http://localhost:9001)
+# Scanners em Docker entram na rede "quality" e usam http://sonarqube:9000 (ver scripts/scan.sh).
+name: sonarqube
+
+services:
+  postgres:
+    # PostgreSQL 17.11 (o SonarQube Community Build 26.x suporta PostgreSQL 15 a 18). Fixado por digest (OWASP A03).
+    image: postgres:17.11@sha256:ff87138949ad9a46f32ff23bd6852b52ce024a13dffe9b4087be98292cdd3b4f
+    environment:
+      POSTGRES_USER: sonarqube
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: sonarqube
+      # O SonarQube exige banco em UTF-8.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks: [sonarqube-internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonarqube -d sonarqube"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  sonarqube:
+    # SonarQube Community Build 26.11. Fixado por digest.
+    # Exige vm.max_map_count >= 524288 no host (Elasticsearch embutido); ver README.
+    image: sonarqube:26.11.0.134175-community@sha256:1ce197471f5f2bac347694a336862fd2c23e9f57c6edb46acebbfbe70f2c7d9c
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonarqube
+      SONAR_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
+      # Passcode do monitoramento: permite ao healthcheck consultar /api/system/health sem credencial de usuário.
+      SONAR_WEB_SYSTEMPASSCODE: ${SONAR_SYSTEM_PASSCODE:?defina SONAR_SYSTEM_PASSCODE no .env}
+      SONAR_TELEMETRY_ENABLE: "false"
+    ulimits:
+      nofile: { soft: 131072, hard: 131072 }
+      nproc: { soft: 8192, hard: 8192 }
+    ports:
+      # Só em localhost; a porta 9000 do host já é do Graylog.
+      - "127.0.0.1:9001:9000"
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-logs:/opt/sonarqube/logs
+    networks: [sonarqube-internal, quality]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs -H \"X-Sonar-Passcode: $$SONAR_WEB_SYSTEMPASSCODE\" http://localhost:9000/api/system/health | grep -q GREEN"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    restart: unless-stopped
+
+  provisioner:
+    # Cria/atualiza (idempotente) senha do admin, segurança, Quality Gate, projetos e tokens pela Web API.
+    build: ./provisioning
+    depends_on:
+      sonarqube: { condition: service_healthy }
+    environment:
+      SONAR_URL: http://sonarqube:9000
+      SONAR_ADMIN_PASSWORD: ${SONAR_ADMIN_PASSWORD:?defina SONAR_ADMIN_PASSWORD no .env}
+    volumes:
+      # Tokens de análise por projeto (fora do git: .tokens/ está no .gitignore).
+      - ./.tokens:/tokens
+    networks: [sonarqube-internal]
+    restart: "no"
+
+networks:
+  sonarqube-internal: {}
+  # Rede compartilhada com nome fixo: scanners em Docker de outros projetos entram nela.
+  quality:
+    name: quality
+
+volumes:
+  postgres-data:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-logs:
