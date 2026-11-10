@@ -1,4 +1,4 @@
-# SonarQube — qualidade de código do C:\Workspace
+# SonarQube — qualidade de código
 
 SonarQube **Community Build 26.11** + PostgreSQL 17 em Docker, **provisionado automaticamente**: troca da senha
 padrão, acesso anônimo bloqueado, Quality Gate do workspace como padrão, projetos e tokens de análise. Os projetos
