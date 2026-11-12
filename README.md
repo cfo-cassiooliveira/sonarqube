@@ -2,7 +2,7 @@
 
 SonarQube **Community Build 26.11** + PostgreSQL 17 em Docker, **provisionado automaticamente**: troca da senha
 padrão, acesso anônimo bloqueado, Quality Gate do workspace como padrão, projetos e tokens de análise. Os projetos
-[legado](../legado), [Site-Principal](../Site-Principal) e [Site-Menu](../Site-Menu) são analisados aqui.
+[legado](../legado), [Site-Principal](../Site-Principal), [Site-Menu](../Site-Menu) e [keycloak](../keycloak) são analisados aqui.
 Decisões: [ADR-0001](docs/adr/0001-stack-sonarqube-community.md).
 
 ## Pré-requisito do host: `vm.max_map_count`
@@ -38,7 +38,7 @@ docker compose -f docker-compose.yml -f docker-compose.graylog.yml up -d
 | Admin | A senha padrão `admin/admin` é trocada pela `SONAR_ADMIN_PASSWORD` |
 | Segurança | `sonar.forceAuthentication=true` (anônimo recebe 401) e projetos novos privados |
 | Quality Gate `Workspace Way` (padrão) | Código novo: **0 issues**, **cobertura ≥ 80%**, **duplicação ≤ 3%**, **100% dos hotspots revisados** (Constituição, Art. V.3) |
-| Projetos ([`projects.json`](provisioning/projects.json)) | `legado-cadastro-usuarios`, `site-principal`, `site-menu` |
+| Projetos ([`projects.json`](provisioning/projects.json)) | `legado-cadastro-usuarios`, `site-principal`, `site-menu`, `keycloak` |
 | Tokens | Um token de análise **por projeto** (só analisa aquele projeto), salvo em `.tokens/<key>.token` |
 
 As condições do gate são sincronizadas a cada execução: alterações feitas pela UI são desfeitas (o script é a fonte da
@@ -54,6 +54,7 @@ novas sempre contam.
 | legado (.NET + Angular) | `./scripts/sonar-analysis.sh` |
 | Site-Principal | `npm run test:coverage && ../sonarqube/scripts/scan.sh .` |
 | Site-Menu | `../sonarqube/scripts/scan.sh .` |
+| keycloak | `./scripts/sonar-analysis.sh` (Maven + JaCoCo, no container JDK 21) |
 
 O [`scripts/scan.sh`](scripts/scan.sh) roda o `sonar-scanner-cli` em Docker na rede `quality`, lê a key do
 `sonar-project.properties` do projeto, usa o token de `.tokens/` (ou `SONAR_TOKEN`) e **termina com erro se o Quality
