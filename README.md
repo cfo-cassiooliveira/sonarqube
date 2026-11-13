@@ -42,7 +42,7 @@ docker compose -f docker-compose.yml -f docker-compose.graylog.yml up -d
 | Tokens | Um token de análise **por projeto** (só analisa aquele projeto), salvo em `.tokens/<key>.token` |
 
 As condições do gate são sincronizadas a cada execução: alterações feitas pela UI são desfeitas (o script é a fonte da
-verdade). Para mudar, edite o script e rode `docker compose run --rm provisioner`.
+verdade). Para mudar, edite o script e rode `docker compose run --rm --no-deps provisioner` (o `--no-deps` evita recriar a stack sem o override do Graylog).
 
 O SonarQube ignora cobertura e duplicação quando a mudança tem menos de 20 linhas novas ("Clean as You Code"); as issues
 novas sempre contam.
@@ -63,7 +63,7 @@ Gate reprovar**.
 ### Projeto novo
 
 1. Adicione `{ "key": "...", "name": "..." }` ao [`provisioning/projects.json`](provisioning/projects.json).
-2. `docker compose up -d --build provisioner` (cria o projeto e o token).
+2. `docker compose run --rm --build --no-deps provisioner` (cria o projeto e o token).
 3. No projeto: `sonar-project.properties` (ou o scanner do .NET) e os testes com cobertura (lcov/OpenCover/VS XML).
 
 ## Variáveis de ambiente (`.env`)
