@@ -61,7 +61,7 @@ jobs:
       - run: sudo sysctl -w vm.max_map_count=524288 fs.file-max=131072
       - run: ./scripts/generate-env.sh
       - run: docker compose up -d --build --wait sonarqube
-      - name: Provisionamento (duas vezes: prova a idempotência)
+      - name: Provisionamento (duas vezes, prova a idempotência)
         run: docker compose run --rm --no-deps provisioner && docker compose run --rm --no-deps provisioner
       - run: ./scripts/smoke-test.sh
       - name: Logs em caso de falha
