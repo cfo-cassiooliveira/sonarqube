@@ -77,6 +77,10 @@ Gate reprovar**.
 O `scripts/generate-env.sh` preenche tudo. O `.env` e a pasta `.tokens/` estão no `.gitignore`, e o
 [`.env.example`](.env.example) só documenta as variáveis, sem nenhum valor.
 
+No **Linux**, crie a pasta `.tokens/` e rode o provisionamento com o seu usuário para conseguir ler os tokens que ele
+grava: `mkdir -p .tokens && export PROVISIONER_UID=$(id -u) PROVISIONER_GID=$(id -g)`. No Docker Desktop
+(Windows/macOS) isso não é necessário.
+
 ## Teste (smoke test ponta a ponta)
 
 ```bash

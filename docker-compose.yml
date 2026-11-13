@@ -58,6 +58,9 @@ services:
   provisioner:
     # Cria/atualiza (idempotente) senha do admin, segurança, Quality Gate, projetos e tokens pela Web API.
     build: ./provisioning
+    # No Linux o host lê os tokens gravados em .tokens/: rode com o seu UID/GID (PROVISIONER_UID/PROVISIONER_GID no
+    # ambiente). No Docker Desktop (Windows/macOS) o dono do arquivo não importa e vale o padrão (nobody).
+    user: "${PROVISIONER_UID:-65534}:${PROVISIONER_GID:-65534}"
     depends_on:
       sonarqube: { condition: service_healthy }
     environment:

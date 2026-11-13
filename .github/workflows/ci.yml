@@ -60,10 +60,12 @@ jobs:
       # O Elasticsearch embutido no SonarQube exige vm.max_map_count >= 524288.
       - run: sudo sysctl -w vm.max_map_count=524288 fs.file-max=131072
       - run: ./scripts/generate-env.sh
+      # O host lê os tokens que o provisioner grava em .tokens/: o container roda com o UID/GID do runner.
+      - run: mkdir -p .tokens && echo "PROVISIONER_UID=$(id -u)" >> "$GITHUB_ENV" && echo "PROVISIONER_GID=$(id -g)" >> "$GITHUB_ENV"
       - run: docker compose up -d --build --wait sonarqube
       - name: Provisionamento (duas vezes, prova a idempotência)
         run: docker compose run --rm --no-deps provisioner && docker compose run --rm --no-deps provisioner
       - run: ./scripts/smoke-test.sh
       - name: Logs em caso de falha
         if: failure()
-        run: docker compose logs --no-color sonarqube provisioner | tail -200
+        run: docker compose logs --no-color | tail -300
