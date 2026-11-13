@@ -38,7 +38,7 @@ docs/adr/                   decisões
 
 ```bash
 ./scripts/generate-env.sh && docker compose up -d --build
-docker compose run --rm provisioner                       # reaplica o provisionamento
+docker compose run --rm --no-deps provisioner             # reaplica o provisionamento (--no-deps: não recria a stack)
 ./scripts/smoke-test.sh
 ./scripts/scan.sh <pasta-do-projeto>
 ```

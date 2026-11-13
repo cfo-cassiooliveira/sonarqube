@@ -1,0 +1,3 @@
+# Falsos positivos do gitleaks (security.md). Cada entrada com o motivo.
+# smoke-api.sh: o header usa a variável ${SONAR_SYSTEM_PASSCODE} (lida do .env fora do git), não um valor literal.
+59bfaf8d3a78325cd75d1fc2acf4247d2c05e87d:scripts/smoke-api.sh:curl-auth-user:33
