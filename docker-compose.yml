@@ -7,6 +7,8 @@ services:
   postgres:
     # PostgreSQL 17.11 (o SonarQube Community Build 26.x suporta PostgreSQL 15 a 18). Fixado por digest (OWASP A03).
     image: postgres:17.11@sha256:ff87138949ad9a46f32ff23bd6852b52ce024a13dffe9b4087be98292cdd3b4f
+    # Teto de memória: um serviço não derruba os demais na VM do WSL2 (20 GB, ver ~/.wslconfig).
+    mem_limit: 512m
     environment:
       POSTGRES_USER: sonarqube
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
@@ -27,6 +29,8 @@ services:
     # SonarQube Community Build 26.11. Fixado por digest.
     # Exige vm.max_map_count >= 524288 no host (Elasticsearch embutido); ver README.
     image: sonarqube:26.11.0.134175-community@sha256:1ce197471f5f2bac347694a336862fd2c23e9f57c6edb46acebbfbe70f2c7d9c
+    # Teto de memória: um serviço não derruba os demais na VM do WSL2 (20 GB, ver ~/.wslconfig).
+    mem_limit: 3500m
     depends_on:
       postgres: { condition: service_healthy }
     environment:
