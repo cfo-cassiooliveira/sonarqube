@@ -1,4 +1,5 @@
 # SonarQube — qualidade de código
+> Índice rápido: `docs/INDEX.md`.
 
 > Herda a Constituição (`C:\Workspace\CLAUDE.md`) e o steering (`C:\Workspace\.claude\rules\`), em especial
 > `testing-quality.md`. Projeto de infraestrutura (sem código de aplicação): aplicam-se Art. IV, V.2/V.3, X e XI.
