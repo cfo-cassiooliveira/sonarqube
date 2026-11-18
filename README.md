@@ -99,3 +99,7 @@ em código novo, **reprova** pela condição `new_violations`. O projeto sintét
 - Tokens por projeto do tipo *Project Analysis Token*: um token vazado só permite analisar aquele projeto. Para
   rotacionar, apague o arquivo em `.tokens/` e rode o provisionamento (o token antigo é revogado).
 - Login local (admin) e uso **local/desenvolvimento** sem TLS: veja as ressalvas do ADR-0001.
+
+## Grafana
+
+O `../grafana` mostra o volume e os erros dos logs do SonarQube (dashboard `sonarqube-infra`); veja [../grafana](../grafana/README.md).

@@ -42,3 +42,7 @@ docker compose run --rm --no-deps provisioner             # reaplica o provision
 ./scripts/smoke-test.sh
 ./scripts/scan.sh <pasta-do-projeto>
 ```
+
+## Grafana
+
+Os logs do SonarQube alimentam o dashboard `sonarqube-infra` do `../grafana` (veja `../grafana/README.md`).
